@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}FitBuddy{% endblock %}</title>
+<script>try{var t=localStorage.getItem('fb-theme');if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+{% block head %}{% endblock %}
+</head>
+<body>
+<header class="nav">
+  <a class="logo" href="{{ '/dashboard' if user else '/' }}"><span class="logo-mark">F</span>FitBuddy</a>
+  <nav>
+    {% if user %}
+    <a href="/dashboard" class="{% block nav_dash %}{% endblock %}">Dashboard</a>
+    <a href="/new" class="{% block nav_new %}{% endblock %}">New plan</a>
+    <form action="/logout" method="post" class="inline"><button class="linkbtn" type="submit">Log out</button></form>
+    {% else %}
+    <a href="/login" class="{% block nav_login %}{% endblock %}">Log in</a>
+    <a href="/register" class="nav-cta">Sign up</a>
+    {% endif %}
+    <button id="theme-btn" class="icon-btn" type="button" aria-label="Toggle theme">◐</button>
+  </nav>
+</header>
+<main class="wrap">{% block content %}{% endblock %}</main>
+<footer class="foot">FitBuddy · AI-generated plans are guidance, not medical advice.</footer>
+<script>
+document.getElementById('theme-btn').onclick=function(){
+  var r=document.documentElement,n=r.dataset.theme==='dark'?'light':'dark';
+  r.dataset.theme=n;try{localStorage.setItem('fb-theme',n)}catch(e){}
+};
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

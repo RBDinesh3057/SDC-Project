@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}My dashboard · FitBuddy{% endblock %}
+{% block nav_dash %}active{% endblock %}
+{% block content %}
+{% set plans = user.workout_plans | sort(attribute='id', reverse=true) | list %}
+{% set adjusted = plans | selectattr('updated_plan') | list | length %}
+<section class="top">
+  <span class="pill">● Your dashboard</span>
+  <h1>Welcome back, <em>{{ user.username }}</em>.</h1>
+  <a class="btn inlinebtn" href="/new">+ New workout plan</a>
+</section>
+
+<section class="kpis four">
+  <div class="card"><b>{{ plans | length }}</b><span>Plans generated</span></div>
+  <div class="card"><b>{{ adjusted }}</b><span>Plans adjusted</span></div>
+  <div class="card"><b class="cap">{{ user.goal or '—' }}</b><span>Current goal</span></div>
+  <div class="card bmi" id="bmi-card" data-h="{{ user.height or '' }}" data-w="{{ user.weight or '' }}" hidden>
+    <span class="label">BMI</span>
+    <div class="bmi-num" id="bmi-num">–</div>
+    <div class="bmi-bar"><i id="bmi-dot"></i></div>
+    <p id="bmi-text"></p>
+  </div>
+</section>
+
+<div class="stats">
+  <span><small>Age</small>{{ user.age or '—' }}</span>
+  <span><small>Height</small>{{ user.height or '—' }}</span>
+  <span><small>Weight</small>{{ user.weight or '—' }}</span>
+  <span><small>Intensity</small>{{ user.intensity or '—' }}</span>
+</div>
+
+<h2 class="sect">My plans</h2>
+{% if plans %}
+<div class="plan-list">
+  {% for wp in plans %}
+  <a class="card plan-item" href="/plan/{{ wp.id }}">
+    <div class="card-head">
+      <b>Plan #{{ loop.revindex }}</b>
+      {% if wp.updated_plan %}<span class="tag tag-medium">Adjusted</span>{% else %}<span class="tag">Original</span>{% endif %}
+    </div>
+    <p class="muted">{{ (wp.updated_plan or wp.original_plan)[:170] | replace('#','') | replace('*','') }}…</p>
+    <span class="open">Open plan →</span>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card empty">You haven't generated a plan yet. <a href="/new" class="acc">Create your first one →</a></div>
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="/static/bmi.js"></script>{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · FitBuddy{% endblock %}
+{% block nav_admin %}active{% endblock %}
+{% block content %}
+{% set ns = namespace(plans=0, updated=0) %}
+{% for user in users %}{% for wp in user.workout_plans %}
+  {% set ns.plans = ns.plans + 1 %}{% if wp.updated_plan %}{% set ns.updated = ns.updated + 1 %}{% endif %}
+{% endfor %}{% endfor %}
+
+<section class="top">
+  <span class="pill">● Admin</span>
+  <h1>Users &amp; <em>plans</em></h1>
+  <div class="kpis">
+    <div class="card"><b>{{ users|length }}</b><span>Users</span></div>
+    <div class="card"><b>{{ ns.plans }}</b><span>Plans generated</span></div>
+    <div class="card"><b>{{ ns.updated }}</b><span>Plans adjusted</span></div>
+  </div>
+</section>
+
+<input type="search" id="q" class="search" placeholder="Search by name, goal or intensity…">
+
+<div class="card table-card">
+  <table id="tbl">
+    <thead><tr>
+      <th>User</th><th>Age</th><th>Weight</th><th>Goal</th><th>Intensity</th><th>Original plan</th><th>Updated plan</th>
+    </tr></thead>
+    <tbody>
+    {% for user in users %}{% for wp in user.workout_plans %}
+      <tr>
+        <td><b>{{ user.username }}</b></td>
+        <td>{{ user.age }}</td>
+        <td>{{ user.weight }}</td>
+        <td>{{ user.goal }}</td>
+        <td><span class="tag tag-{{ user.intensity }}">{{ user.intensity }}</span></td>
+        <td class="clip">{{ wp.original_plan[:150] }}…</td>
+        <td class="clip">{% if wp.updated_plan %}{{ wp.updated_plan[:150] }}…{% else %}<em class="muted">No updates</em>{% endif %}</td>
+      </tr>
+    {% endfor %}{% endfor %}
+    {% if not users %}<tr><td colspan="7" class="empty">No users yet.</td></tr>{% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('q').oninput=function(){
+  var v=this.value.toLowerCase();
+  document.querySelectorAll('#tbl tbody tr').forEach(function(r){
+    r.style.display=r.textContent.toLowerCase().indexOf(v)>-1?'':'none';
+  });
+};
+</script>
+{% endblock %}

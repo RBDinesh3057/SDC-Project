@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Your Plan · FitBuddy{% endblock %}
+{% block head %}<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>{% endblock %}
+{% block content %}
+<section class="top">
+  <a class="pill" href="/dashboard">← Back to dashboard</a>
+  <h1>Hey <em>{{ username }}</em>, let's get to work.</h1>
+  <div class="stats">
+    <span><small>Goal</small>{{ goal }}</span>
+    <span><small>Intensity</small>{{ intensity }}</span>
+    <span><small>Age</small>{{ age }}</span>
+    <span><small>Height</small>{{ height if height else '—' }}</span>
+    <span><small>Weight</small>{{ weight }}</span>
+  </div>
+</section>
+
+<section class="bento">
+  <article class="card plan">
+    <div class="card-head">
+      <h2>7-day workout plan</h2>
+      <div class="actions">
+        <button class="ghost" id="copy" type="button">Copy</button>
+        <button class="ghost" onclick="window.print()" type="button">Print / PDF</button>
+      </div>
+    </div>
+    <div id="workout-content" hidden>{{ plan }}</div>
+    <div id="parsed-workout" class="md"></div>
+  </article>
+
+  <aside class="side">
+    <article class="card bmi" id="bmi-card" data-h="{{ height or '' }}" data-w="{{ weight or '' }}" hidden>
+      <span class="label">Body mass index</span>
+      <div class="bmi-num" id="bmi-num">–</div>
+      <div class="bmi-bar"><i id="bmi-dot"></i></div>
+      <p id="bmi-text"></p>
+      <small>Estimate assuming weight in kg. BMI is a rough guide only.</small>
+    </article>
+
+    <article class="card tip">
+      <span class="label">Nutrition &amp; recovery</span>
+      <div id="tip-content" hidden>{{ tip }}</div>
+      <div id="parsed-tip" class="md"></div>
+    </article>
+
+    <article class="card">
+      <span class="label">Adjust with AI</span>
+      <form action="/submit-feedback" method="post" class="fb">
+        <input type="hidden" name="wp_id" value="{{ wp_id }}">
+        <input type="text" name="feedback" placeholder="More cardio, add yoga…" required>
+        <button type="submit" class="btn small" id="upd">Update plan</button>
+      </form>
+    </article>
+  </aside>
+</section>
+{% endblock %}
+{% block scripts %}
+<script src="/static/bmi.js"></script>
+<script>
+var raw=document.getElementById('workout-content').textContent;
+document.getElementById('parsed-workout').innerHTML=marked.parse(raw);
+document.getElementById('parsed-tip').innerHTML=marked.parse(document.getElementById('tip-content').textContent);
+
+document.getElementById('copy').onclick=function(){
+  var b=this;navigator.clipboard.writeText(raw).then(function(){b.textContent='Copied ✓';setTimeout(function(){b.textContent='Copy'},1500)});
+};
+document.querySelector('.fb').addEventListener('submit',function(){
+  var b=document.getElementById('upd');b.textContent='Updating…';b.classList.add('busy');
+});
+
+</script>
+{% endblock %}

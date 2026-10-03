@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Sign up' if mode == 'register' else 'Log in' }} · FitBuddy{% endblock %}
+{% block content %}
+<section class="auth">
+  <form method="post" action="/{{ mode }}" class="card form">
+    <span class="pill">● {{ 'New account' if mode == 'register' else 'Welcome back' }}</span>
+    <h2>{{ 'Create your account' if mode == 'register' else 'Log in to FitBuddy' }}</h2>
+    {% if error %}<div class="alert">{{ error }}</div>{% endif %}
+    {% if mode == 'register' %}
+    <label>Name<input type="text" name="username" placeholder="Alex Doe" required></label>
+    {% endif %}
+    <label>User ID<input type="text" name="user_id" placeholder="alex_01" autocomplete="username" required></label>
+    <label>Password<input type="password" name="password" placeholder="At least 6 characters" autocomplete="{{ 'new-password' if mode == 'register' else 'current-password' }}" required></label>
+    <button type="submit" class="btn">{{ 'Sign up →' if mode == 'register' else 'Log in →' }}</button>
+    <p class="swap muted">
+      {% if mode == 'register' %}Already registered? <a href="/login">Log in</a>
+      {% else %}New here? <a href="/register">Create an account</a>{% endif %}
+    </p>
+  </form>
+</section>
+{% endblock %}
